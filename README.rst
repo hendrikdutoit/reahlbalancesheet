@@ -115,7 +115,7 @@ Considerations and Constraints
 4. The data file is not checked and assume a, Excel file.  Loading a non-Excel file will have unexpected results.
 5. SQLite is unstable and erratic due to the number of sessions it can handle.  We recommend to use MYSL:
 
-    1. Stop teh Reahl Server if it is running (crtl-c)
+    1. Stop the Reahl Server if it is running (crtl-c)
     2. Ensure MySQL is installed
     3. Change the etc/reahl.config.py by commenting out the SQLite URI and enable the MySQL URI
     4. Change the userid and password in the MySQL URI to contain an existing userid and password with admin rights.
