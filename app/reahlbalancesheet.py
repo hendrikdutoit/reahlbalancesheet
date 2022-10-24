@@ -17,7 +17,7 @@ from reahl.component.modelinterface import (
 from reahl.sqlalchemysupport import Session, Base
 from reahl.web.plotly import Chart
 import plotly.graph_objects as pg
-from sqlalchemy import Column, Integer, UnicodeText, Date, LargeBinary, func
+from sqlalchemy import Column, Integer, UnicodeText, Date, LargeBinary
 from openpyxl import load_workbook
 from io import BytesIO
 
@@ -146,10 +146,10 @@ class GraphPage(CustomerPage):
         self.body.add_child(Chart(view, fig1, 'line'))
 
     def create_line_chart_figure(self):
-        # rec = Session.query(Customer).last()
-        rec = Session.query(Customer).filter(
-            Customer.id == Session.query(func.max(Customer.id))
-        )
+        rec = Session.query(Customer).first()
+        # rec = Session.query(Customer).filter(
+        #     Customer.id == Session.query(func.max(Customer.id))
+        # )
         # import pdb;pdb.set_trace()
         wb = load_workbook(filename=BytesIO(rec[0].bscontents))
         ws = wb.active
