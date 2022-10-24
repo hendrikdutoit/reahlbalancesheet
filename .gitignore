@@ -12,6 +12,7 @@ TestData/*_env/
 .git/
 tmp/
 etc/
+*.db
 
 
 # Byte-compiled / optimized / DLL files
