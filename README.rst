@@ -113,7 +113,7 @@ Considerations and Constraints
 
 3. The data in the sheet must be in the ranges as in 2 above.
 4. The data file is not checked and assume a, Excel file.  Loading a non-Excel file will have unexpected results.
-5. SQLite is unstable and erratic due to the number of sessions it can handle.  We recommend to use MYSL:
+5. SQLite is unstable and erratic due to the number of sessions it can handle.  We recommend to use MySQL:
 
     1. Stop the Reahl Server if it is running (crtl-c)
     2. Ensure MySQL is installed
