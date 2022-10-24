@@ -41,7 +41,7 @@ This project is configured to run in a virtual environment.  For more installati
 
     $ python -m pip install -U pip
     $ pip install -U virtualenv
-    $ python3 -m venv ./reahl_env
+    $ python -m venv ./reahl_env
     $ source ./reahl_env/bin/activate
 
 
@@ -49,14 +49,15 @@ This project is configured to run in a virtual environment.  For more installati
 
 .. code-block:: bash
 
-    $ python3 -m pip install reahl[declarative,sqlite,dev,doc]
+    $ pip install --upgrade -r requirements.txt
+    $ pip install reahl[declarative,sqlite,dev,doc]
 
 
 4. Initialize the database.  Make sure you are in the ~./myprojects/reaahlbalancesheet directory:
 
 .. code-block:: bash
 
-    $ python -m pip install --no-deps -e .
+    $ pip install --no-deps -e .
     $ reahl createdbuser etc
     $ reahl createdb etc
     $ reahl createdbtables etc
