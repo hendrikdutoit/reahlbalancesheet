@@ -17,7 +17,9 @@ from reahl.component.modelinterface import (
 from reahl.sqlalchemysupport import Session, Base
 from reahl.web.plotly import Chart
 import plotly.graph_objects as pg
-from sqlalchemy import Column, Integer, UnicodeText, Date, LargeBinary
+from sqlalchemy import Column, Integer, UnicodeText, Date, LargeBinary, func
+from openpyxl import load_workbook
+from io import BytesIO
 
 
 class CustomerPage(HTML5Page):
@@ -32,6 +34,7 @@ class CustomerPage(HTML5Page):
         navbar.layout.add(Nav(view).with_bookmarks(bookmarks))
 
         self.body.add_child(navbar)
+        self.curr_rec_id = None
         # self.body.add_child(CustomerBookPanel(view))
 
 
@@ -59,8 +62,6 @@ class CustomerForm(Form):
         inputs.layout.add_input(TextInput(self, new_customer.fields.name))
         inputs.layout.add_input(TextInput(self, new_customer.fields.dob))
 
-        # attachments = self.add_child(FieldSet(view, legend_text='Attach files'))
-        # attachments.use_layout(FormLayout())
         inputs.layout.add_input(
             FileUploadInput(self, new_customer.fields.uploaded_files), hide_label=True
         )
@@ -84,7 +85,11 @@ class CustomerBox(Widget):
     def __init__(self, view, customer):
         super().__init__(view)
         self.add_child(
-            P(view, text='%s %s, %s' % (customer.dob, customer.surname, customer.name))
+            P(
+                view,
+                text='%s %s, %s - %s'
+                % (customer.dob, customer.surname, customer.name, customer.bsfilename),
+            )
         )
 
 
@@ -101,7 +106,7 @@ class CustomerUI(UserInterface):
         graph.set_page(GraphPage.factory(bookmarks))
 
         self.define_transition(Customer.events.save, add, graph)
-        self.define_transition(GraphPage.events.back, graph, home)
+        # self.define_transition(GraphPage.events.back, graph, home)
 
 
 class Customer(Base):
@@ -137,69 +142,27 @@ class GraphPage(CustomerPage):
     def __init__(self, view, main_bookmarks):
         super().__init__(view, main_bookmarks)
 
-        fig1 = self.create_bar_chart_figure()
-        self.body.add_child(Chart(view, fig1, 'bar'))
-
-        self.add_child(Button(self, self.events.back))
+        fig1 = self.create_line_chart_figure()
+        self.body.add_child(Chart(view, fig1, 'line'))
 
     def create_line_chart_figure(self):
-        x = [
-            'Jan',
-            'Feb',
-            'Mar',
-            'Apr',
-            'May',
-            'Jun',
-            'Jul',
-            'Aug',
-            'Sep',
-            'Oct',
-            'Nov',
-            'Dec',
-        ]
+        # rec = Session.query(Customer).last()
+        rec = Session.query(Customer).filter(
+            Customer.id == Session.query(func.max(Customer.id))
+        )
+        # import pdb;pdb.set_trace()
+        wb = load_workbook(filename=BytesIO(rec[0].bscontents))
+        ws = wb.active
+        months = [c.value for c in ws['A'][1:]]
+        income = [c.value for c in ws['B'][1:]]
+        expences = [c.value for c in ws['C'][1:]]
         fig = pg.Figure()
-        fig.add_trace(
-            pg.Scatter(
-                x=x, y=[1000, 1500, 1360, 1450, 1470, 1500, 1700], name='first line'
-            )
-        )
-        fig.add_trace(
-            pg.Scatter(
-                x=x,
-                y=[
-                    100,
-                    200,
-                    300,
-                    450,
-                    530,
-                    570,
-                    600,
-                    640,
-                    630,
-                    690,
-                ],
-                name='second line',
-            )
-        )
+        fig.add_trace(pg.Scatter(x=months, y=income, name=ws['B'][0].value))
+        fig.add_trace(pg.Scatter(x=months, y=expences, name=ws['C'][0].value))
         fig.update_layout(
-            title="Line chart",
+            title=f"{rec[0].name} {rec[0].surname} - Income and Expenditure",
             hovermode="x unified",
-            xaxis_title="X Axis Title",
-            yaxis_title="Y Axis Title",
+            xaxis_title='Months',
+            yaxis_title='Amount',
         )
         return fig
-
-    def create_bar_chart_figure(self):
-        fig = pg.Figure()
-        fig.add_trace(pg.Bar(y=[2, 3, 1], x=['foo', 'bar', 'baz']))
-        fig.update_layout(
-            title="Bar chart", xaxis_title="X Axis Title", yaxis_title="Y Axis Title"
-        )
-        return fig
-
-    def back(self):
-        pass
-
-    @exposed('back')
-    def events(self, events):
-        events.back = Event(label='Back', action=Action(self.back))

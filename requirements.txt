@@ -5,9 +5,4 @@
 # packageit\pimp.ini and
 # D:\Dropbox\Projects\reahlbalancesheet\.packageit\packageit.ini
 #===================================================================
-beetools
-configparserext
-releaselogit
-semverit
-termcolor
-toml
+openpyxl

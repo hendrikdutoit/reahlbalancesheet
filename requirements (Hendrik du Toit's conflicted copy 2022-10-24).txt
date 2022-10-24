@@ -5,5 +5,4 @@
 # packageit\pimp.ini and
 # D:\Dropbox\Projects\reahlbalancesheet\.packageit\packageit.ini
 #===================================================================
-pip
-wheel
+openpyxl
