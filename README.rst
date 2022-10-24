@@ -17,8 +17,9 @@ Project Short Description
 Prerequisites
 =============
 
-1.  Python 3.8
-2.  Reahl 6.0
+1. Python 3.8
+2. Reahl 6.0
+3. MySQL 8.0
 
 ============
 Installation
@@ -51,13 +52,14 @@ This project is configured to run in a virtual environment.  For more installati
 .. code-block:: bash
 
     $ pip install --upgrade -r requirements.txt
-    $ pip install reahl[declarative,sqlite,dev,doc]
+    $ pip install reahl[declarative,sqlite,mysql,dev,doc]
 
 
 4. Initialize the database.  Make sure you are in the ~./myprojects/reaahlbalancesheet directory:
 
 .. code-block:: bash
 
+    $ reahl dropdb etc -y
     $ pip install --no-deps -e .
     $ reahl createdbuser etc
     $ reahl createdb etc
@@ -111,3 +113,11 @@ Considerations and Constraints
 
 3. The data in the sheet must be in the ranges as in 2 above.
 4. The data file is not checked and assume a, Excel file.  Loading a non-Excel file will have unexpected results.
+5. SQLite is unstable and erratic due to the number of sessions it can handle.  We recommend to use MYSL:
+
+    1. Stop teh Reahl Server if it is running (crtl-c)
+    2. Ensure MySQL is installed
+    3. Change the etc/reahl.config.py by commenting out the SQLite URI and enable the MySQL URI
+    4. Change the userid and password in the MySQL URI to contain an existing userid and password with admin rights.
+    5. Re-initialise the database again as in step 4 of the Installation.
+    6. Restart the Reahl server
